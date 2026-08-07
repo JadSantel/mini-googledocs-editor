@@ -81,13 +81,13 @@ until this is true on your machine.
 **Goal:** register, log in, log out, and protect routes — before any
 document or editor code exists.
 
-- [ ] Install Auth.js and Prisma adapter
+- [✅] Install Auth.js and Prisma adapter
   ```bash
   cd apps/web
   pnpm add next-auth@beta @auth/prisma-adapter bcryptjs
   pnpm add -D @types/bcryptjs
   ```
-- [ ] Add `User` model to `prisma/schema.prisma` (fields only — relations
+- [✅] Add `User` model to `prisma/schema.prisma` (fields only — relations
       to `Document`/`Collaborator` come in Phase 3)
   ```prisma
   model User {
@@ -99,15 +99,15 @@ document or editor code exists.
     updatedAt DateTime @updatedAt
   }
   ```
-- [ ] Run the first migration
+- [✅] Run the first migration
   ```bash
   npx prisma migrate dev --name init_user
   ```
-- [ ] Create `lib/auth.ts` — Auth.js config with a **Credentials provider**
+- [✅] Create `lib/auth.ts` — Auth.js config with a **Credentials provider**
       that verifies `bcrypt.compare(password, user.password)`
-- [ ] Create `lib/prisma.ts` — a singleton Prisma client (guard against
+- [✅] Create `lib/prisma.ts` — a singleton Prisma client (guard against
       multiple instances in Next.js dev hot-reload)
-- [ ] Create the registration API route (`app/api/register/route.ts`) that
+- [✅] Create the registration API route (`app/api/register/route.ts`) that
       hashes the password with `bcrypt.hash(password, 10)` **before**
       saving — never store plaintext
 - [ ] Wire up `app/api/auth/[...nextauth]/route.ts` for Auth.js's own
