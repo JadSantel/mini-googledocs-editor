@@ -110,13 +110,13 @@ document or editor code exists.
 - [✅] Create the registration API route (`app/api/register/route.ts`) that
       hashes the password with `bcrypt.hash(password, 10)` **before**
       saving — never store plaintext
-- [ ] Wire up `app/api/auth/[...nextauth]/route.ts` for Auth.js's own
+- [✅] Wire up `app/api/auth/[...nextauth]/route.ts` for Auth.js's own
       login/session endpoints
-- [ ] Build minimal `Register` and `Login` pages/forms (no styling polish
+- [✅] Build minimal `Register` and `Login` pages/forms (no styling polish
       yet — function first)
-- [ ] Add a `middleware.ts` that redirects unauthenticated requests away
+- [✅] Add a `middleware.ts` that redirects unauthenticated requests away
       from protected routes (e.g. `/dashboard`, `/documents/*`)
-- [ ] **Test — register:**
+- [✅] **Test — register:**
   ```bash
   curl -X POST http://localhost:3000/api/register \
     -H "Content-Type: application/json" \
@@ -124,12 +124,12 @@ document or editor code exists.
   ```
   Expect: success response, and confirm in Prisma Studio (`npx prisma studio`)
   that the stored `password` field is a bcrypt hash, **not plaintext**.
-- [ ] **Test — login through the UI:** submit the login form, confirm you
+- [✅] **Test — login through the UI:** submit the login form, confirm you
       land on a protected page and a session cookie is set (check devtools
       → Application → Cookies).
-- [ ] **Test — route guard:** while logged out, visit a protected route
+- [✅] **Test — route guard:** while logged out, visit a protected route
       directly by URL — confirm you're redirected to `/login`.
-- [ ] **Test — logout:** confirm the session cookie is cleared and
+- [✅] **Test — logout:** confirm the session cookie is cleared and
       protected routes become inaccessible again.
 
 ✅ **Checkpoint:** full register → login → protected-route → logout cycle
