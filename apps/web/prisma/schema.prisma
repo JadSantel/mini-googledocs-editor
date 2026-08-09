@@ -1,5 +1,4 @@
-// Prisma schema — models are added in Phase 3 per the project plan.
-// This file just establishes the datasource + generator config for now.
+// Prisma schema.
 
 generator client {
   provider = "prisma-client-js"
@@ -11,10 +10,94 @@ datasource db {
 }
 
 model User {
-    id        String   @id @default(cuid())
-    username  String   @unique
-    email     String   @unique
-    password  String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-  }
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Reverse relations — Prisma requires these declared on both sides.
+  // All default to Restrict (see onDelete below on the owning side),
+  // so deleting a user with any of these still attached fails loudly
+  // instead of silently cascading into other people's data.
+  ownedDocuments   Document[]     @relation("DocumentOwner")
+  collaborations   Collaborator[]
+  comments         Comment[]
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  title     String
+  ownerId   String
+  owner     User     @relation("DocumentOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  collaborators Collaborator[]
+  comments      Comment[]
+  snapshots     DocumentSnapshot[]
+
+  // Dashboard search/list is Phase 4, but the index that makes it fast
+  // belongs with the schema, not bolted on later as an afterthought.
+  @@index([ownerId])
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+model Collaborator {
+  id         String @id @default(cuid())
+  documentId String
+  userId     String
+  role       Role
+
+  // Child of Document — cascades, since a collaborator record is
+  // meaningless once the document it grants access to is gone.
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  // Child of User in the sense of "who," but NOT cascaded — a user
+  // can't be deleted while they still hold access somewhere. Forces
+  // explicit "remove this person from all documents first" handling.
+  user     User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  // A given user should only have ONE role on a given document —
+  // this constraint also makes "is user X already a collaborator on
+  // doc Y" a single indexed lookup instead of a table scan.
+  @@unique([documentId, userId])
+}
+
+model Comment {
+  id            String   @id @default(cuid())
+  documentId    String
+  authorId      String
+  text          String
+  startPosition Int
+  endPosition   Int
+  createdAt     DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  author   User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  // `resolved` (Boolean) and `parentId` (self-relation, for threaded
+  // replies) are intentionally NOT here yet — Phase 10 adds them as
+  // its own small migration, matching the build checklist. Keeping
+  // Phase 3 scoped to exactly what it's supposed to build.
+
+  @@index([documentId])
+}
+
+model DocumentSnapshot {
+  id         String   @id @default(cuid())
+  documentId String
+  // Yjs updates are binary, not text — Bytes matches what Phase 7
+  // actually serializes and writes here.
+  snapshot   Bytes
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, createdAt])
+}

@@ -143,7 +143,7 @@ point should ever touch a plaintext password.
 **Goal:** the full relational schema exists and every relation is
 provably correct via Prisma Studio, before any UI reads or writes to it.
 
-- [ ] Extend `prisma/schema.prisma` with the remaining models
+- [✅] Extend `prisma/schema.prisma` with the remaining models
   ```prisma
   model Document {
     id        String   @id @default(cuid())
@@ -194,19 +194,19 @@ provably correct via Prisma Studio, before any UI reads or writes to it.
     createdAt  DateTime @default(now())
   }
   ```
-- [ ] Add the reverse relations to `User` (`documents`, `collaborations`,
+- [✅] Add the reverse relations to `User` (`documents`, `collaborations`,
       `comments`) so Prisma's type generation is bidirectional
-- [ ] Run the migration
+- [✅] Run the migration
   ```bash
   npx prisma migrate dev --name add_documents_collaborators_comments
   ```
-- [ ] Create a `prisma/seed.ts` script that creates 2 test users, 1
+- [✅] Create a `prisma/seed.ts` script that creates 2 test users, 1
       document owned by user A, and adds user B as an `EDITOR` collaborator
-- [ ] Wire the seed script into `package.json`
+- [✅] Wire the seed script into `package.json`
   ```json
   "prisma": { "seed": "tsx prisma/seed.ts" }
   ```
-- [ ] **Test:** run the seed and open Prisma Studio
+- [✅] **Test:** run the seed and open Prisma Studio
   ```bash
   npx prisma db seed
   npx prisma studio
