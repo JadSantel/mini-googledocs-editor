@@ -61,18 +61,18 @@ export function DocumentDashboard({ initialDocuments }: DocumentDashboardProps) 
             ]);
             return { previous, tempId };
         },
-        onError: (_err,_vars,context) => {
+        onError: (_err, _vars, context) => {
             if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
         },
         onSuccess: (created, _vars, context) => {
             queryClient.setQueryData<ClientDocument[]>(queryKey, (old = []) =>
-                old.map((doc) => (doc.id === context?,tempId ? created : doc)), 
+                old.map((doc) => (doc.id === context?.tempId ? created : doc)),
             );
         },
     });
 
-    const renameMutation = useMutation ({
-        mutationFn: ({ id, title }: { id: string; title: string}) => {
+    const renameMutation = useMutation({
+        mutationFn: async ({ id, title }: { id: string; title: string}) => {
             const response = await fetch(`/api/documents/${id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
@@ -90,17 +90,67 @@ export function DocumentDashboard({ initialDocuments }: DocumentDashboardProps) 
             return { previous };
         },
         onError: (_err, _vars, context) => {
-            if (context?.previous) queryClient.setQueryData();
+            if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
         },
     });
 
     const deleteMutation = useMutation({
         mutationFn: async (id: string) => {
-            const respone = await fetch(`/api/documents/${id}`, { method: "DELETE" });
+            const response = await fetch(`/api/documents/${id}`, { method: "DELETE" });
             if (!response.ok) throw new Error("Failed to delete document");
         },
-        
+        onMutate: async (id: string) => {
+            await queryClient.cancelQueries({ queryKey });
+            const previous = queryClient.getQueryData<ClientDocument[]>(queryKey);
+            queryClient.setQueryData<ClientDocument[]>(queryKey, (old = []) =>
+                old.filter((doc) => doc.id !== id),
+            );
+            return { previous };
+        },
+        onError: (_err, _vars, context) => {
+            if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
+        },
     });
 
-    
+    return (
+        <div className="mx-auto max-w-2xl px-4 py-12">
+        <div className="mb-6 flex items-center justify-between gap-4">
+            <h1 className="text-2xl font-semibold">Documents</h1>
+            <button
+            onClick={() => createMutation.mutate()}
+            disabled={createMutation.isPending}
+            className="rounded bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            >
+            New Document
+            </button>
+        </div>
+
+        <input
+            type="search"
+            placeholder="Search documents…"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="mb-6 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+        />
+
+        {documents.length === 0 ? (
+            <p className="py-8 text-center text-sm text-gray-400">
+            {debouncedSearch ? "No documents match your search." : "No documents yet — create one to get started."}
+            </p>
+        ) : (
+            <div>
+            {documents.map((doc) => (
+                <DocumentRow
+                key={doc.id}
+                document={doc}
+                onRename={(id, title) => renameMutation.mutate({ id, title })}
+                onDelete={(id) => deleteMutation.mutate(id)}
+                isDeleting={deleteMutation.isPending && deleteMutation.variables === doc.id}
+                />
+            ))}
+            </div>
+        )}
+        </div>
+    );
+
 }

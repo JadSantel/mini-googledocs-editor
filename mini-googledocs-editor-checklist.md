@@ -231,29 +231,29 @@ cleanly from scratch, and relations are verified by hand — not assumed.
 real UI, using plain HTTP — before WebSockets or the rich text editor
 enter the picture.
 
-- [ ] Create `app/api/documents/route.ts` — `GET` (list owned + shared
+- [✅] Create `app/api/documents/route.ts` — `GET` (list owned + shared
       documents for the logged-in user) and `POST` (create)
-- [ ] Create `app/api/documents/[id]/route.ts` — `PATCH` (rename) and
+- [✅] Create `app/api/documents/[id]/route.ts` — `PATCH` (rename) and
       `DELETE`
-- [ ] Add a `lib/permissions.ts` helper: `getUserRole(userId, documentId)`
+- [✅] Add a `lib/permissions.ts` helper: `getUserRole(userId, documentId)`
       that returns `OWNER | EDITOR | VIEWER | null` — this becomes the
       single source of truth every later route checks against
-- [ ] Build `Dashboard` page: list of documents (title, updated-at,
+- [✅] Build `Dashboard` page: list of documents (title, updated-at,
       your role), a "New Document" button, search input, delete button
       (owner-only — disabled/hidden otherwise)
-- [ ] Add optimistic UI for create/rename/delete using React Query
+- [✅] Add optimistic UI for create/rename/delete using React Query
       mutations, so the list updates before the network round-trip
       completes
-- [ ] **Test — create:** click "New Document," confirm it appears
+- [✅] **Test — create:** click "New Document," confirm it appears
       immediately in the list and persists after a page refresh.
-- [ ] **Test — rename:** rename a document, confirm the new title
+- [✅] **Test — rename:** rename a document, confirm the new title
       persists after refresh.
-- [ ] **Test — search:** create 3 documents with distinct titles, confirm
+- [✅] **Test — search:** create 3 documents with distinct titles, confirm
       the search box filters correctly.
-- [ ] **Test — permission boundary:** log in as the non-owner collaborator
+- [✅] **Test — permission boundary:** log in as the non-owner collaborator
       seeded in Phase 3, confirm the delete button is hidden/disabled for
       documents you don't own.
-- [ ] **Test — direct API bypass attempt:** as the non-owner user, call
+- [✅] **Test — direct API bypass attempt:** as the non-owner user, call
       the delete endpoint directly with `curl` (bypassing the UI):
   ```bash
   curl -X DELETE http://localhost:3000/api/documents/<doc-id> \
