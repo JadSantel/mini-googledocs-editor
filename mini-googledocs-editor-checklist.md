@@ -272,31 +272,31 @@ are enforced server-side, independent of what the UI shows or hides.
 **Goal:** prove the rich text editor itself works — formatting, tables,
 undo/redo — while it's still only talking to local component state.
 
-- [ ] Install TipTap core + starter extensions
+- [✅] Install TipTap core + starter extensions
   ```bash
   pnpm add @tiptap/react @tiptap/pm @tiptap/starter-kit \
     @tiptap/extension-link @tiptap/extension-table \
     @tiptap/extension-table-row @tiptap/extension-table-cell \
     @tiptap/extension-table-header @tiptap/extension-underline
   ```
-- [ ] Create `components/editor/Editor.tsx` using `useEditor()` with
+- [✅] Create `components/editor/Editor.tsx` using `useEditor()` with
       `StarterKit` (headings, bold, italic, lists, code block, blockquote,
       undo/redo come bundled) plus Link, Table, Underline
-- [ ] Build `components/editor/Toolbar.tsx` as a **separate** component
+- [✅] Build `components/editor/Toolbar.tsx` as a **separate** component
       that reads `editor` state and calls `editor.chain().focus()...run()`
       commands — keep it decoupled from `Editor.tsx` per the
       separation-of-concerns rule
-- [ ] Wire a document's page (`app/documents/[id]/page.tsx`) to render
+- [✅] Wire a document's page (`app/documents/[id]/page.tsx`) to render
       `<Editor />`, initially with hardcoded placeholder content
-- [ ] **Test — formatting:** for each of bold, italic, underline, strike,
+- [✅] **Test — formatting:** for each of bold, italic, underline, strike,
       headings (H1–H3), bullet list, ordered list, code block, blockquote,
       and link — apply it via the toolbar and confirm the DOM updates
       correctly.
-- [ ] **Test — table:** insert a table, add/remove a row and column,
+- [✅] **Test — table:** insert a table, add/remove a row and column,
       confirm it renders correctly.
-- [ ] **Test — undo/redo:** make 5 edits, undo all 5, redo all 5, confirm
+- [✅] **Test — undo/redo:** make 5 edits, undo all 5, redo all 5, confirm
       state matches at each step.
-- [ ] **Test — keyboard shortcuts:** confirm `Cmd/Ctrl+B`, `Cmd/Ctrl+I`,
+- [✅] **Test — keyboard shortcuts:** confirm `Cmd/Ctrl+B`, `Cmd/Ctrl+I`,
       `Cmd/Ctrl+Z` work without touching the toolbar.
 
 ✅ **Checkpoint:** the editor is fully functional as a **single-user,
