@@ -24,7 +24,11 @@
     "next": "16.3.0",
     "next-auth": "5.0.0-beta.32",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "@tiptap/extension-collaboration": "^3.30.0",
+    "@tiptap/extension-collaboration-cursor": "^3.30.0",
+    "y-websocket": "^2.0.4",
+    "yjs": "^13.6.20"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
