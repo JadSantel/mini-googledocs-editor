@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
+    "@collab-editor/shared-types": "workspace:*",
     "@prisma/client": "^5.20.0",
     "@tanstack/react-query": "^5.101.4",
     "@tiptap/extension-table": "^3.30.0",
@@ -19,6 +20,7 @@
     "@tiptap/react": "^3.30.0",
     "@tiptap/starter-kit": "^3.30.0",
     "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
     "next": "16.3.0",
     "next-auth": "5.0.0-beta.32",
     "react": "19.2.8",

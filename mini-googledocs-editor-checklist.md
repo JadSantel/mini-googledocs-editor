@@ -311,7 +311,7 @@ collaboration layer, not the editor itself.
 **Goal:** a client can open a socket, send a message, and receive one
 back — before Yjs, presence, or cursors touch it.
 
-- [ ] Define the shared message protocol in `packages/shared-types`
+- [✅] Define the shared message protocol in `packages/shared-types`
   ```ts
   export type ClientMessage =
     | { type: "join-document"; documentId: string }
@@ -321,28 +321,28 @@ back — before Yjs, presence, or cursors touch it.
     | { type: "joined"; documentId: string }
     | { type: "error"; message: string };
   ```
-- [ ] Implement `apps/realtime-server/src/socket/server.ts` — bind a `ws`
+- [✅] Implement `apps/realtime-server/src/socket/server.ts` — bind a `ws`
       `WebSocketServer` to an HTTP server, log connect/disconnect
-- [ ] Implement basic auth on connect: read a session token from the
+- [✅] Implement basic auth on connect: read a session token from the
       connection query string or headers, validate it (reuse Auth.js's
       session-verification logic via a shared secret/JWT — decide and
       document which approach, since this is the one place your two apps
       must agree on a security contract)
-- [ ] Handle `join-document` / `leave-document` messages, tracking which
+- [✅] Handle `join-document` / `leave-document` messages, tracking which
       documentId each socket is currently in (in-memory `Map` for now —
       Redis comes in Phase 12)
-- [ ] Add a `NEXT_PUBLIC_REALTIME_WS_URL` env var in `apps/web` and a
+- [✅] Add a `NEXT_PUBLIC_REALTIME_WS_URL` env var in `apps/web` and a
       thin `lib/socket.ts` client wrapper
-- [ ] **Test — manual connect:** using `wscat` or browser devtools:
+- [✅] **Test — manual connect:** using `wscat` or browser devtools:
   ```bash
   npx wscat -c "ws://localhost:4000?token=<session-token>"
   ```
   Send `{"type":"join-document","documentId":"<id>"}`, expect
   `{"type":"joined","documentId":"<id>"}` back.
-- [ ] **Test — unauthenticated connection:** attempt to connect without a
+- [✅] **Test — unauthenticated connection:** attempt to connect without a
       valid token, confirm the server rejects/closes the connection
       rather than accepting it silently.
-- [ ] **Test — disconnect cleanup:** connect, join a document, close the
+- [✅] **Test — disconnect cleanup:** connect, join a document, close the
       connection, confirm server logs show it removed from the in-memory
       tracking (add a temporary debug log if needed).
 
