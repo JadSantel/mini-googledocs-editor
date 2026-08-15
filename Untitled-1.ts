@@ -70,6 +70,7 @@ export function Editor({ documentId, readOnly = false }: EditorProps) {
     };
   }, [documentId, ydoc]);
 
+  // Refresh token before the 60s TTL expires (realtime-token route uses 60s)
   useEffect(() => {
     if (!provider) {
       return;
@@ -98,6 +99,7 @@ export function Editor({ documentId, readOnly = false }: EditorProps) {
       editable: !readOnly,
       extensions: [
         StarterKit.configure({
+          // REQUIRED when using Yjs — Yjs owns undo/redo
           history: false,
           link: {
             openOnClick: false,

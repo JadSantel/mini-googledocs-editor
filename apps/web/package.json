@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prisma:generate": "prisma generate",
+    "prisma:generate": "prisma generate && node -e \"const fs=require('fs'); const path=require('path'); const src=path.resolve(__dirname,'../../node_modules/.prisma/client'); const dest=path.resolve(__dirname,'node_modules/@prisma/client/.prisma/client'); fs.mkdirSync(path.dirname(dest), {recursive:true}); fs.rmSync(dest, {recursive:true, force:true}); fs.cpSync(src, dest, {recursive:true, force:true});\"",
     "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
@@ -26,7 +26,6 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "@tiptap/extension-collaboration": "^3.30.0",
-    "@tiptap/extension-collaboration-cursor": "^3.30.0",
     "y-websocket": "^2.0.4",
     "yjs": "^13.6.20"
   },

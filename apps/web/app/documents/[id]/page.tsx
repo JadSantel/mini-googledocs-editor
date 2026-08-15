@@ -35,7 +35,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
         <p className="text-sm text-gray-400">Your role: {role}</p>
       </div>
 
-      <Editor />
+      <Editor documentId={id} readOnly={role === "VIEWER"} />
     </div>
   );
 }

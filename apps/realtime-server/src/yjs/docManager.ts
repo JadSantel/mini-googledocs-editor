@@ -9,6 +9,8 @@ import {
   flushOnClose,
   loadSnapshot,
 } from "./persistence.js";
+import { addListener } from "node:process";
+import { Underline } from "lucide-react";
 
 const messageSync = 0;
 const messageAwareness = 1;
@@ -112,7 +114,127 @@ function messageListener(
         const messageType = decoding.readVarUint(decoder);
 
         switch (messageType) {
-            
+            case messageSync: {
+                encoding.writeVarUint(encoder, messageSync);
+                syncProtocol.readSyncMessage(decoder, encoder, doc, conn);
+
+                if (encoding.length(encoder) > 1) {
+                    send(doc, conn, encoding.toUint8Array(encoder));
+                }
+                break;
+            }
+            case messageAwareness: {
+                awarenessProtocol.applyAwarenessUpdate(
+                    doc.awareness,
+                    decoding.readVarUint8Array(decoder),
+                    conn,
+                );
+                break;
+            }
+            default:
+                console.warn(`[yjs] unknown message type=${messageType}`);
         }
+    } catch (err) {
+        console.error("[yjs] message handling failed", err);
+        closeConn(doc, conn);
     }
+}
+
+function closeConn(doc: WSSharedDoc, conn: WebSocket): void {
+    const controlledIds = doc.conns.get(conn);
+    if (controlledIds) {
+        awarenessProtocol.removeAwarenessStates(
+            doc.awareness,
+            Array.from(controlledIds),
+            conn,
+        );
+    }
+
+    doc.conns.delete(conn);
+
+    if (doc.conns.size === 0) {
+        void flushOnClose(doc.name, doc).finally(() => {
+            doc.destroy();
+            docs.delete(doc.name);
+            console.log(`[yjs] destroyed in-memory document=${doc.name}`);
+        });
+    }
+}
+
+export async function setupDocumentConnection(
+    conn: WebSocket,
+    documentId: string,
+): Promise<void> {
+    conn.binaryType = "arraybuffer";
+    
+    const doc = await getOrCreateDoc(documentId);
+    doc.conns.set(conn, new Set());
+
+    const awarenessChangeHandler = (
+        {
+            added,
+            updated,
+            removed,
+        }: {
+            added: number[];
+            updated: number[];
+            removed: number[];
+        },
+        origin: unknown,
+    ): void => {
+        const changedClients = added.concat(updated, removed);
+        const connControlledIds = doc.conns.get(conn);
+
+        if (connControlledIds !== undefined) {
+            added.forEach((clientId) => {
+                connControlledIds.add(clientId);
+            });
+            removed.forEach((clientId) => {
+                connControlledIds.delete(clientId);
+            });
+        }
+
+        const encoder = encoding.createEncoder();
+        encoding.writeVarUint(encoder, messageAwareness);
+        encoding.writeVarUint8Array(
+            encoder,
+            awarenessProtocol.encodeAwarenessUpdate(doc.awareness, changedClients),
+        );
+        broadcast(doc, encoding.toUint8Array(encoder));
+    };
+
+    doc.awareness.on("update", awarenessChangeHandler);
+
+    conn.on("message", (raw: RawData) => {
+        const data =
+        raw instanceof ArrayBuffer
+            ? new Uint8Array(raw)
+            : Buffer.isBuffer(raw)
+                ? new Uint8Array(raw)
+                : new Uint8Array(raw as unknown as ArrayBuffer);
+
+        messageListener(conn, doc, data);
+    });
+
+    conn.on("close", () => {
+        doc.awareness.off("update", awarenessChangeHandler);
+        closeConn(doc, conn);
+        console.log(`[yjs] disconnected from document=${documentId}`);
+    });
+
+    conn.on("error", () => {
+        doc.awareness.off("update", awarenessChangeHandler);
+        closeConn(doc, conn);
+    });
+
+    {
+        const encoder = encoding.createEncoder();
+        encoding.writeVarUint(encoder, messageSync);
+        syncProtocol.writeSyncStep1(encoder, doc);
+        send(doc, conn, encoding.toUint8Array(encoder));
+    }
+
+    console.log(
+        `[yjs] connected document=${documentId} clients=${doc.conns.size}`,
+    );
 }

@@ -9,8 +9,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node --env-file=.env dist/index.js",
     "lint": "eslint . --ext .ts",
-    "prisma:generate": "prisma generate --schema=../web/prisma/schema.prisma",
-    "postinstall": "prisma generate --schema=../web/prisma/schema.prisma"
+    "prisma:generate": "prisma generate --schema=../web/prisma/schema.prisma && node -e \"const fs=require('fs'); const path=require('path'); const src=path.resolve(__dirname,'../../node_modules/.prisma/client'); const dest=path.resolve(__dirname,'node_modules/@prisma/client/.prisma/client'); fs.mkdirSync(path.dirname(dest), {recursive:true}); fs.rmSync(dest, {recursive:true, force:true}); fs.cpSync(src, dest, {recursive:true, force:true});\"",
+    "postinstall": "prisma generate --schema=../web/prisma/schema.prisma && node -e \"const fs=require('fs'); const path=require('path'); const src=path.resolve(__dirname,'../../node_modules/.prisma/client'); const dest=path.resolve(__dirname,'node_modules/@prisma/client/.prisma/client'); fs.mkdirSync(path.dirname(dest), {recursive:true}); fs.rmSync(dest, {recursive:true, force:true}); fs.cpSync(src, dest, {recursive:true, force:true});\""
   },
   "dependencies": {
     "@collab-editor/shared-types": "workspace:*",
