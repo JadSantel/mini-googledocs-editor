@@ -2,6 +2,7 @@ import { createServer, type Server, type IncomingMessage } from "node:http";
 import { WebSocketServer, type WebSocket, type RawData } from "ws";
 import { verifySocketToken } from "../lib/auth.js";
 import { getUserRole } from "../lib/permission.js";
+import { prisma } from "../lib/prisma.js";
 import { setupDocumentConnection } from "../yjs/docManager.js";
 import { joinRoom, leaveCurrentRoom, getCurrentDocument } from "./rooms.js";
 import type { ClientMessage, ServerMessage } from "@collab-editor/shared-types";
@@ -49,7 +50,6 @@ export function createSocketServer(): Server {
     const userId = req.userId ?? "unknown";
     const documentId = parseDocumentId(req.url);
 
-    // Phase 7 path: ws://host/{documentId}?token=...
     if (documentId) {
       void (async () => {
         const role = await getUserRole(userId, documentId);
@@ -58,12 +58,19 @@ export function createSocketServer(): Server {
           return;
         }
 
+
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { username: true },
+        });
+        const username = user?.username ?? "Unknown";
+
         console.log(
-          `[socket] user=${userId} connected to document=${documentId} role=${role}`,
+          `[socket] user=${userId} (${username}) connected to document=${documentId} role=${role}`,
         );
 
         try {
-          await setupDocumentConnection(ws, documentId);
+          await setupDocumentConnection(ws, documentId, userId, username);
         } catch (err) {
           console.error("[socket] failed to setup document connection", err);
           ws.close(1011, "Internal error");
@@ -73,7 +80,6 @@ export function createSocketServer(): Server {
       return;
     }
 
-    // Phase 6 legacy path: ws://host?token=... + JSON join/leave
     console.log(`[socket] connected user=${userId} (legacy JSON mode)`);
 
     ws.on("message", (raw: RawData) => {

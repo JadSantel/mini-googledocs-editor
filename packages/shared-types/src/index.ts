@@ -21,5 +21,11 @@ export interface ErrorMessage {
   message: string;
 }
 
+export interface PresenceUser {
+  id: string;
+  username: string;
+  color: string;
+}
+
 /** Every message shape the server is allowed to send back. */
-export type ServerMessage = JoinedMessage | ErrorMessage;
+export type ServerMessage = JoinedMessage | ErrorMessage | PresenceUser;

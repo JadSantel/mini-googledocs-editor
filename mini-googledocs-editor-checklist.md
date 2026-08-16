@@ -367,7 +367,7 @@ automatically, with no central lock and no lost keystrokes.
 > user's work" actually means at the algorithm level, not just as a
 > feature description.
 
-- [ ] Install Yjs + bindings
+- [✅] Install Yjs + bindings
   ```bash
   # apps/web
   pnpm add yjs y-websocket @tiptap/extension-collaboration \
@@ -375,33 +375,33 @@ automatically, with no central lock and no lost keystrokes.
   # apps/realtime-server
   pnpm add yjs y-protocols
   ```
-- [ ] Implement the server-side Yjs document manager
+- [✅] Implement the server-side Yjs document manager
       (`apps/realtime-server/src/yjs/docManager.ts`) — one `Y.Doc` per
       `documentId`, held in memory, applying/broadcasting binary updates
       to every socket in that document's room
-- [ ] Wire `document-update` binary messages through the socket layer
+- [✅] Wire `document-update` binary messages through the socket layer
       from Phase 6 (Yjs updates are binary, not JSON — this is a
       different message path than `join-document`)
-- [ ] On the client, replace TipTap's plain content with the
+- [✅] On the client, replace TipTap's plain content with the
       `Collaboration` extension bound to a `Y.Doc`, connected via
       `y-websocket`'s `WebsocketProvider`
-- [ ] Add periodic persistence: on an interval (or on last-client-leaves),
+- [✅] Add periodic persistence: on an interval (or on last-client-leaves),
       serialize the `Y.Doc` state and write it as a `DocumentSnapshot` row
       via Prisma, so a fresh server restart doesn't lose data
-- [ ] On document load, if a snapshot exists, hydrate the `Y.Doc` from it
+- [✅] On document load, if a snapshot exists, hydrate the `Y.Doc` from it
       before accepting new connections
-- [ ] **Test — two-tab sync:** open the same document in two browser tabs
+- [✅] **Test — two-tab sync:** open the same document in two browser tabs
       (or two browsers), type in tab A, confirm text appears in tab B
       within roughly a second, with correct cursor position (not jumping
       to the end).
-- [ ] **Test — simultaneous typing:** type in both tabs at the same time,
+- [✅] **Test — simultaneous typing:** type in both tabs at the same time,
       in different parts of the document — confirm both sets of changes
       are present in both tabs afterward, nothing overwritten.
-- [ ] **Test — offline merge:** in tab A, open devtools → Network → set to
+- [✅] **Test — offline merge:** in tab A, open devtools → Network → set to
       "Offline." Type several sentences. Meanwhile type different content
       in tab B (still online). Set tab A back online. Confirm both
       changes merge into a single consistent document in both tabs.
-- [ ] **Test — persistence across restart:** stop the realtime server,
+- [✅] **Test — persistence across restart:** stop the realtime server,
       confirm a `DocumentSnapshot` row exists in Postgres, restart the
       server, reload the document, confirm content is intact.
 
