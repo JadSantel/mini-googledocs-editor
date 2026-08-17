@@ -32,9 +32,29 @@ export function usePresence(
             awareness.getStates().forEach((state: AwarenessState, clientID) => {
                 if (clientID == localClientId) return;
                 const u = state.user;
-                if (u?.userId  )
-        });
- 
+                if (u?.userId && u.username) {
+                    result.push({
+                        id: u.userId,
+                        username: u.username,
+                        color: getUserColor(u.userId),
+                    });
+                }
+            });
+
+            return result;
         }
-    });
+
+        function handleChange(){
+            setUsers(buildUserlist());
+        }
+
+        awareness.on("change", handleChange);
+        setUsers(buildUserlist());
+
+        return () => {
+            awareness.off("change", handleChange);
+        };
+    }, [provider]);
+
+    return users;
 }
